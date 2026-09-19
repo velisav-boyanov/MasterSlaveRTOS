@@ -1,0 +1,46 @@
+Device A
+
+             B = ACTIVE
+        ┌─────────────────┐
+        │                 ▼
+     ┌──────┐          ┌────────────┐
+     │ IDLE │ ───────► │ PROCESSING │
+     └──────┘          └────────────┘
+        ▲                    │
+        │                    │ processing complete
+        │                    ▼
+        │                  IDLE
+        │
+        │ B = FAULT
+        │
+        ▼
+     ┌───────┐
+     │ ERROR │
+     └───────┘
+
+
+
+Device B
+
+             random
+        ┌───────────────┐
+        │               ▼
+     ┌───────┐       ┌────────┐
+     │ SLEEP │ ◄────►│ ACTIVE │
+     └───────┘       └────────┘
+        ▲                │
+        │                │ random fault
+        │                ▼
+        │             ┌───────┐
+        └─────────────│ FAULT │
+                      └───────┘
+
+EX
+
+A: IDLE       B: SLEEP
+A: IDLE       B: ACTIVE
+A: PROCESSING B: ACTIVE
+A: PROCESSING B: FAULT
+A: ERROR      B: FAULT
+A: IDLE       B: SLEEP
+...
