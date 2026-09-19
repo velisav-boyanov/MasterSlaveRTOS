@@ -23,6 +23,9 @@ static void deviceBSetState(deviceBState newState)
             strcpy(mssg, "Stays in");
         }
 
+        //change state
+        currentState = newState;
+
         if (newState != DEVICE_B_FAULT)
         {
             LOG_MSG(printMutex, "[Device B] %s %s\n",mssg, DEVICE_B_STATE_STRING(newState));    

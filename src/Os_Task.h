@@ -37,7 +37,7 @@ typedef enum
 
 //user param macros
 #define TEST1
-#define TEST2
+//#define TEST2
 #define DEBUG          1u
 #define DEVICE_A_DELAY 500u
 #define DEVICE_B_DELAY 1000u
