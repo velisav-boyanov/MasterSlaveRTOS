@@ -4,7 +4,6 @@
 static deviceAState currentState = DEVICE_A_IDLE;
 static QueueHandle_t deviceQueue;
 static QueueHandle_t deviceQueueMasterToSlave;
-static int iteration = 0;
 
 static void deviceASetState(deviceAState newState)
 {
@@ -43,9 +42,6 @@ static void deviceAMainFunction(void *vpParams)
 
     do
     {
-        iteration++;
-        LOG_MSG("[Device A] iteration: %d\n", iteration);
-
         //polling the queue
         if (xQueueReceive(deviceQueue, &message, 0) == pdPASS)
         {
@@ -106,10 +102,6 @@ static void deviceAMainFunction(void *vpParams)
                 }
             }
         }
-        xSemaphoreTake(printMutex, portMAX_DELAY);
-
-        xSemaphoreGive(printMutex);
-
         /* Device A waits for 1 second */
         vTaskDelay(pdMS_TO_TICKS(DEVICE_A_DELAY));
     }while(1);

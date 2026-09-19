@@ -29,14 +29,21 @@ typedef enum
     DEVICE_B_FAULT
 } deviceBState;
 
+typedef enum
+{
+    REG_STATE=0,//regular working state used for robustness test
+    ERR_STATE//causes device B to always be in error state
+} testState;
+
 //user param macros
+#define TEST1
+#define TEST2
 #define DEBUG          1u
 #define DEVICE_A_DELAY 500u
 #define DEVICE_B_DELAY 1000u
 
 //user func macros
 #define STRING_GEN(STRING)             #STRING
-#define CALC_DELAY(INIT_DELAY, PARAM)  (((int)INIT_DELAY)*(((int)PARAM)+1))
 
 #define DEVICE_B_STATE_STRING(DV_B_ENUM) \
     ((DV_B_ENUM) == DEVICE_B_SLEEP  ? "DEVICE_B_SLEEP" : \
@@ -72,6 +79,6 @@ typedef enum
 
 //user funcs
 void deviceAStart(QueueHandle_t queue1, QueueHandle_t queue2);
-void deviceBStart(QueueHandle_t queue1, QueueHandle_t queue2);
+void deviceBStart(QueueHandle_t queue1, QueueHandle_t queue2, testState deviceBTest);
 
 #endif

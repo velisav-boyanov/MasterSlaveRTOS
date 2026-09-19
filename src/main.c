@@ -5,28 +5,28 @@ QueueHandle_t deviceQueueMasterToSlave;
 
 int main(void)
 {
-    #ifdef DEBUG
-    
-    #endif
-
     deviceQueue = xQueueCreate(10, sizeof(deviceBState));
     deviceQueueMasterToSlave = xQueueCreate(10, sizeof(deviceBState));
 
     //run test A
+    #ifdef TEST2
+    LOG_MSG("Running error test...\n");
+    deviceAStart(deviceQueue, deviceQueueMasterToSlave);
+    deviceBStart(deviceQueue, deviceQueueMasterToSlave, ERR_STATE);
+    
+    vTaskStartScheduler();
+    #endif //TEST2
 
     //run test B
-
+    #ifdef TEST1
     LOG_MSG("Running robustness test...\n");
     deviceAStart(deviceQueue, deviceQueueMasterToSlave);
-    deviceBStart(deviceQueue, deviceQueueMasterToSlave);
+    deviceBStart(deviceQueue, deviceQueueMasterToSlave, REG_STATE);
 
     vTaskStartScheduler();
+    #endif //TEST1
 
-    /*
-     * We should never get here because the scheduler
-     * normally does not return.
-     */
-    LOG_MSG("ERROR: Scheduler stopped!\n");
+    LOG_ERR("Scheduler stopped!\n");
 
     return 1;
 }
