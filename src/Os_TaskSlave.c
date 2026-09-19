@@ -6,6 +6,7 @@ static QueueHandle_t deviceQueue;
 static QueueHandle_t deviceQueueMasterToSlave;
 static uint8 restarts = 0;
 static testState deviceUnderTest = REG_STATE;
+static SemaphoreHandle_t printMutex;
 
 static void deviceBSetState(deviceBState newState)
 {
@@ -24,11 +25,11 @@ static void deviceBSetState(deviceBState newState)
 
         if (newState != DEVICE_B_FAULT)
         {
-            LOG_MSG("[Device B] %s %s\n",mssg, DEVICE_B_STATE_STRING(newState));    
+            LOG_MSG(printMutex, "[Device B] %s %s\n",mssg, DEVICE_B_STATE_STRING(newState));    
         }
         else
         {
-            LOG_ERR("[Device B] %s %s\n",mssg, DEVICE_B_STATE_STRING(newState));
+            LOG_ERR(printMutex, "[Device B] %s %s\n",mssg, DEVICE_B_STATE_STRING(newState));
         }
 
         xQueueSend(
@@ -43,32 +44,31 @@ static void deviceBMainFunction(void *vpParams)
 {
     unsigned int u32randomVal;
     deviceBState message;
-    SemaphoreHandle_t printMutex;
 
     printMutex = xSemaphoreCreateMutex();
 
     if (printMutex == NULL)
     {
-        LOG_ERR("Could not create print mutex\n");
+        LOG_ERR(printMutex, "Could not create print mutex\n");
         //log error
         return;
     }
 
-    LOG_MSG("[Device B] Started in %s\n", DEVICE_B_STATE_STRING(currentState));
+    LOG_MSG(printMutex, "[Device B] Started in %s\n", DEVICE_B_STATE_STRING(currentState));
 
     do
     {
         //polling the queue
         if (xQueueReceive(deviceQueueMasterToSlave, &message, 0) == pdPASS)
         {
-            LOG_WRN("[Device B] Restarted by Device A\n");
+            LOG_WRN(printMutex, "[Device B] Restarted by Device A\n");
             deviceBSetState(message);
             if (deviceUnderTest == ERR_STATE)
             {
                 restarts++;
                 if (restarts >= 4)//B has been restared by A enough time, stoping simulation
                 {   
-                    LOG_MSG("[Device B] Stopped error handling test\n\n\n");
+                    LOG_MSG(printMutex, "[Device B] Stopped error handling test\n\n\n");
                     vTaskEndScheduler();
                     vTaskDelete(NULL);
                 }

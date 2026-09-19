@@ -63,14 +63,21 @@ typedef enum
 
 //logging macros
 #if DEBUG
-    #define LOG_MSG(fmt, ...) \
-        printf("[INFO]    " fmt, ##__VA_ARGS__)    
+    #define LOG_PRINT(mutex, prefix, fmt, ...)       \
+        do {                                         \
+            xSemaphoreTake((mutex), portMAX_DELAY);  \
+            printf(prefix fmt, ##__VA_ARGS__);       \
+            xSemaphoreGive((mutex));                \
+        } while (0)
 
-    #define LOG_ERR(fmt, ...) \
-        printf("[ERROR]   " fmt, ##__VA_ARGS__) 
+    #define LOG_MSG(mutex, fmt, ...) \
+        LOG_PRINT(mutex, "[INFO]    ", fmt, ##__VA_ARGS__)
 
-    #define LOG_WRN(fmt, ...) \
-        printf("[WARNING] " fmt, ##__VA_ARGS__)     
+    #define LOG_ERR(mutex, fmt, ...) \
+        LOG_PRINT(mutex, "[ERROR]   ", fmt, ##__VA_ARGS__)
+
+    #define LOG_WRN(mutex, fmt, ...) \
+        LOG_PRINT(mutex, "[WARNING] ", fmt, ##__VA_ARGS__)   
 #else
     #define LOG_MSG(fmt, ...) ((void)0)
     #define LOG_WRN(fmt, ...) ((void)0)    
